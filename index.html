@@ -50,19 +50,24 @@
     </div>
 
     <script>
+        // Konfigurasi Link
         const CONFIG = {
             logoUrl: `https://lh3.googleusercontent.com/d/1wdO4pFct6MG6itzbKvwAAcMXBXz8523N`,
             previewUrl: `https://drive.google.com/file/d/1ryX7WPEkk7w8EG287ysehUJMLaYlZvkG/preview`,
             downloadUrl: `https://drive.google.com/file/d/1ryX7WPEkk7w8EG287ysehUJMLaYlZvkG/view?usp=sharing`,
             skTimUrl: "https://drive.google.com/file/d/1EYm_dWzV4eh4yDxNxClyvLRUgsNMP7-w/view?usp=drive_link",
             materiSosialisasiUrl: "https://drive.google.com/drive/folders/1RR5DRhYvSKdPQXx7urWwlgs0wv_LU02w?usp=sharing",
+            
+            // Link Kertas Kerja yang sudah diperbarui
+            kertasKerjaMrUrl: "https://docs.google.com/spreadsheets/d/130t925qSK9NYAusdKqxxZDoIEgoNmNejEllUip9Nj5o/edit?gid=666067745#gid=666067745", 
             pemantauanRisikoUrl: "https://docs.google.com/spreadsheets/d/1eP49Ho26uXyspYFChscbqthKWxNuD0Bd/edit?usp=drive_link&ouid=115730438453768465879&rtpof=true&sd=true",
+            
             mariTemanUrl: "https://risiko.web.bps.go.id/app/",
             mrpkBabelUrl: "https://babel.web.bps.go.id/mrpk/index.php",
             qualityGatesSheetUrl: "https://docs.google.com/spreadsheets/d/1HXneNP1-9eKyEF76vGFXuystevnZnKuJ/edit?gid=2036669957#gid=2036669957", 
             laporanQgUrl: "https://drive.google.com/drive/folders/1EMdoCnuTY0Aob9X_7S2WN-MkSe39eYZI?usp=drive_link",
             aplikasiQgateUrl: "https://nqaf.web.bps.go.id/qgate/",
-            sheetId: "1T2tjP76iTd7eMx2qtqxdvPhExxwPT3dhxKQqoSaSmsA"
+            sheetId: "1T2tjP76iTd7eMx2qtqxdvPhExxwPT3dhxKQqoSaSmsA" // ID Spreadsheet untuk fetching data dashboard
         };
 
         const uploadMenuData = [
@@ -109,7 +114,6 @@
                     const cols = jsonData.table.cols;
                     const rows = jsonData.table.rows;
 
-                    // MENCARI INDEKS KOLOM DINAMIS BERDASARKAN LABEL/NAMA HEADER
                     const colMap = {
                         tim: cols.findIndex(c => c.label.toLowerCase().includes('tim')),
                         tahun: cols.findIndex(c => c.label.toLowerCase().includes('tahun')),
@@ -127,10 +131,7 @@
                     let mappedData = rows.map((row, index) => {
                         const c = row.c;
                         const title = c[colMap.tim]?.v || "Tim Tidak Diketahui";
-                        
-                        const matchingTim = uploadMenuData.find(item => 
-                            item.title.toLowerCase().trim() === title.toLowerCase().trim()
-                        );
+                        const matchingTim = uploadMenuData.find(item => item.title.toLowerCase().trim() === title.toLowerCase().trim());
                         const driveLink = matchingTim ? matchingTim.url : "#";
                         
                         return {
@@ -156,7 +157,6 @@
                         };
                     });
 
-                    // LOGIKA PENGURUTAN: Sangat Tinggi > Tinggi > Sedang
                     mappedData.sort((a, b) => {
                         if (b.levels.sangatTinggi !== a.levels.sangatTinggi) return b.levels.sangatTinggi - a.levels.sangatTinggi;
                         if (b.levels.tinggi !== a.levels.tinggi) return b.levels.tinggi - a.levels.tinggi;
@@ -401,10 +401,7 @@
 
         function renderDashboard() {
             const filteredData = state.selectedYear ? state.timData.filter(d => d.year === state.selectedYear) : state.timData;
-            
-            // PERUBAHAN: Sekarang totalRisks menjumlahkan dari kolom identifikasi risiko (stats.identifikasi)
             const totalRisks = filteredData.reduce((acc, curr) => acc + curr.stats.identifikasi, 0);
-            
             const completedTeams = filteredData.filter(t => t.stats.progress >= 100).length;
 
             let tableContent = state.isLoading ? `<tr><td colspan="8" class="py-20 text-center"><i data-lucide="loader-2" class="w-10 h-10 text-blue-600 animate-spin mx-auto mb-4"></i><p class="font-bold text-slate-400 uppercase tracking-widest text-[10px]">Memuat Data...</p></td></tr>` : 
@@ -425,21 +422,9 @@
                         <td class="px-4 py-6 text-center"><span class="px-3 py-1.5 rounded-full font-bold text-[10px] italic ${tim.stats.identifikasi > 0 ? 'bg-blue-100 text-blue-700' : 'bg-slate-50 text-slate-400'}">${tim.stats.identifikasi}</span></td>
                         <td class="px-4 py-6 text-center"><span class="px-3 py-1.5 rounded-full font-bold text-[10px] italic ${tim.stats.analisis > 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-50 text-slate-400'}">${tim.stats.analisis}</span></td>
                         <td class="px-4 py-6 text-center"><span class="px-3 py-1.5 rounded-full font-bold text-[10px] italic ${tim.stats.rtp > 0 ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-50 text-slate-400'}">${tim.stats.rtp}</span></td>
-                        <td class="px-4 py-6 text-center bg-yellow-50/30">
-                            <span class="px-3 py-1.5 rounded-xl font-bold text-[10px] italic ${tim.levels.sedang > 0 ? 'bg-yellow-200 text-yellow-800 shadow-sm' : 'bg-white/50 text-slate-300'}">
-                                ${tim.levels.sedang}
-                            </span>
-                        </td>
-                        <td class="px-4 py-6 text-center bg-orange-50/30">
-                            <span class="px-3 py-1.5 rounded-xl font-bold text-[10px] italic ${tim.levels.tinggi > 0 ? 'bg-orange-200 text-orange-800 shadow-sm' : 'bg-white/50 text-slate-300'}">
-                                ${tim.levels.tinggi}
-                            </span>
-                        </td>
-                        <td class="px-4 py-6 text-center bg-rose-50/30">
-                            <span class="px-3 py-1.5 rounded-xl font-bold text-[10px] italic ${tim.levels.sangatTinggi > 0 ? 'bg-rose-200 text-rose-800 shadow-sm' : 'bg-white/50 text-slate-300'}">
-                                ${tim.levels.sangatTinggi}
-                            </span>
-                        </td>
+                        <td class="px-4 py-6 text-center bg-yellow-50/30"><span class="px-3 py-1.5 rounded-xl font-bold text-[10px] italic ${tim.levels.sedang > 0 ? 'bg-yellow-200 text-yellow-800 shadow-sm' : 'bg-white/50 text-slate-300'}">${tim.levels.sedang}</span></td>
+                        <td class="px-4 py-6 text-center bg-orange-50/30"><span class="px-3 py-1.5 rounded-xl font-bold text-[10px] italic ${tim.levels.tinggi > 0 ? 'bg-orange-200 text-orange-800 shadow-sm' : 'bg-white/50 text-slate-300'}">${tim.levels.tinggi}</span></td>
+                        <td class="px-4 py-6 text-center bg-rose-50/30"><span class="px-3 py-1.5 rounded-xl font-bold text-[10px] italic ${tim.levels.sangatTinggi > 0 ? 'bg-rose-200 text-rose-800 shadow-sm' : 'bg-white/50 text-slate-300'}">${tim.levels.sangatTinggi}</span></td>
                         <td class="px-8 py-6">
                             <div class="flex items-center gap-4">
                                 <div class="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden p-0.5 min-w-[80px]"><div class="h-full rounded-full transition-all duration-1000 ${tim.stats.progress >= 100 ? 'bg-emerald-500' : 'bg-blue-500'}" style="width: ${Math.min(tim.stats.progress, 100)}%"></div></div>
@@ -451,70 +436,106 @@
 
             return `
                 <div class="relative z-10 container mx-auto px-6 py-12 lg:py-16 animate-in">
-                    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between mb-12 gap-6">
+                    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between mb-10 gap-6">
                         <button onclick="setState({currentPage: 'home'})" class="flex items-center gap-2 px-8 py-4 bg-white rounded-2xl shadow-sm border border-slate-200 text-slate-800 font-bold text-xs uppercase tracking-widest hover:bg-slate-50 transition-all group"><i data-lucide="arrow-left" class="w-5 h-5 group-hover:-translate-x-1"></i> Kembali</button>
-                        <div class="text-center md:text-right"><h2 class="text-4xl font-black text-slate-900 italic uppercase">Monitoring Pengisian</h2><p class="text-emerald-600 font-bold text-xs uppercase mt-2 tracking-widest">Update Data Real-time</p></div>
+                        <div class="text-center md:text-right"><h2 class="text-4xl font-black text-slate-900 italic uppercase leading-none">Monitoring Pengisian</h2><p class="text-emerald-600 font-bold text-xs uppercase mt-2 tracking-widest">Data Real-time ${state.selectedYear || ''}</p></div>
                     </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-7xl mx-auto mb-10">
-                        <div class="bg-white rounded-[2.5rem] p-8 shadow-xl border border-slate-100 stat-card-glow h-full flex items-center gap-6">
-                            <div class="p-4 bg-blue-50 rounded-[1.5rem]"><i data-lucide="alert-circle" class="w-8 h-8 text-blue-600"></i></div>
-                            <div>
-                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Total Risiko</span>
-                                <span class="text-4xl font-black text-blue-600 italic leading-none">${state.isLoading ? "..." : totalRisks}</span>
-                                <span class="text-[9px] font-bold text-slate-400 block mt-2 uppercase">Berdasarkan Identifikasi</span>
-                            </div>
-                        </div>
-                        <div class="bg-white rounded-[2.5rem] p-8 shadow-xl border border-slate-100 stat-card-glow h-full flex items-center gap-6">
-                            <div class="p-4 bg-emerald-50 rounded-[1.5rem]"><i data-lucide="check-square" class="w-8 h-8 text-emerald-600"></i></div>
-                            <div>
-                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Selesai Matriks</span>
-                                <div class="flex items-baseline gap-1">
-                                    <span class="text-4xl font-black text-emerald-600 italic leading-none">${state.isLoading ? "..." : completedTeams}</span>
-                                    <span class="text-lg font-bold text-slate-300 italic">/ ${filteredData.length}</span>
-                                </div>
-                                <span class="text-[9px] font-bold text-emerald-500 block mt-2 uppercase tracking-tight">Tim Kerja Tuntas</span>
-                            </div>
-                        </div>
+
+                    <!-- Highlight Section -->
+                    <div class="max-w-7xl mx-auto mb-10 space-y-6">
                         
-                        <a href="${CONFIG.pemantauanRisikoUrl}" target="_blank" class="md:col-span-2 highlight-card rounded-[2.5rem] p-8 lg:p-10 group transition-all duration-500 hover:shadow-2xl hover:shadow-blue-900/30 hover:-translate-y-2 border-b-8 border-blue-500 h-full flex items-center">
-                            <div class="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-6 w-full">
-                                <div class="flex items-center gap-6 text-center sm:text-left flex-col sm:flex-row">
-                                    <div class="flex-shrink-0 p-5 bg-blue-500/20 rounded-[1.8rem] border border-blue-500/30">
-                                        <i data-lucide="file-spreadsheet" class="w-8 h-8 text-blue-400"></i>
+                        <!-- 1. Kertas Kerja Manajemen Risiko (Updated Link) -->
+                        <a href="${CONFIG.kertasKerjaMrUrl}" target="_blank" class="group relative block w-full highlight-card rounded-[3.5rem] p-8 md:p-12 overflow-hidden shadow-2xl shadow-blue-900/20 hover:-translate-y-2 transition-all duration-500 border-b-[12px] border-blue-500">
+                            <div class="absolute top-0 right-0 p-10 opacity-10 transform translate-x-1/4 -translate-y-1/4 pointer-events-none">
+                                <i data-lucide="shield-check" class="w-[400px] h-[400px] text-white"></i>
+                            </div>
+                            <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+                                <div class="flex flex-col lg:flex-row items-center gap-8 text-center lg:text-left">
+                                    <div class="w-20 h-20 md:w-28 md:h-28 bg-blue-500/20 rounded-[2rem] border border-blue-500/30 flex items-center justify-center">
+                                        <i data-lucide="file-check" class="w-10 h-10 md:w-14 md:h-14 text-blue-400 group-hover:scale-110 transition-transform"></i>
                                     </div>
-                                    <div class="flex flex-col">
-                                        <h3 class="text-white font-black italic uppercase text-xl md:text-2xl tracking-tighter leading-tight mb-1">KARTU KERJA PEMANTAUAN RISIKO</h3>
-                                        <p class="text-blue-300 font-bold text-[10px] uppercase tracking-widest italic">Akses Kartu Kerja Pemantauan Risiko</p>
+                                    <div class="space-y-2">
+                                        <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-600 text-white rounded-full font-bold text-[9px] uppercase tracking-widest mb-1">
+                                            Akses Langsung
+                                        </div>
+                                        <h3 class="text-3xl md:text-4xl font-black text-white italic uppercase tracking-tighter leading-none">KERTAS KERJA MANAJEMEN RISIKO</h3>
+                                        <p class="text-blue-200/60 font-bold text-xs uppercase tracking-[0.2em] italic">Lembar Identifikasi, Analisis, dan RTP Tim Kerja</p>
                                     </div>
                                 </div>
-                                <div class="flex-shrink-0 w-full sm:w-auto">
-                                    <div class="bg-white text-slate-900 px-8 py-4 rounded-2xl uppercase font-black text-[10px] tracking-widest group-hover:bg-blue-500 group-hover:text-white transition-all shadow-2xl flex items-center justify-center gap-3 italic whitespace-nowrap">
-                                        BUKA SPREADSHEET <i data-lucide="external-link" class="w-4 h-4"></i>
+                                <div class="w-full lg:w-auto">
+                                    <div class="bg-white text-slate-900 px-10 py-4 rounded-[1.8rem] font-black text-xs uppercase tracking-widest shadow-xl flex items-center justify-center gap-3 group-hover:bg-blue-500 group-hover:text-white transition-all italic transform group-hover:scale-105">
+                                        BUKA KERTAS KERJA <i data-lucide="external-link" class="w-5 h-5"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+
+                        <!-- 2. Kartu Kerja Pemantauan Risiko -->
+                        <a href="${CONFIG.pemantauanRisikoUrl}" target="_blank" class="group relative block w-full bg-slate-100 rounded-[2.5rem] p-6 md:p-10 overflow-hidden shadow-sm border border-slate-200 hover:shadow-xl hover:bg-white hover:-translate-y-1 transition-all duration-300">
+                             <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6">
+                                <div class="flex flex-col lg:flex-row items-center gap-6 text-center lg:text-left">
+                                    <div class="w-16 h-16 bg-emerald-600 rounded-2xl flex items-center justify-center shadow-lg">
+                                        <i data-lucide="clipboard-check" class="w-8 h-8 text-white"></i>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <h3 class="text-xl md:text-2xl font-black text-slate-800 italic uppercase tracking-tight">KARTU KERJA PEMANTAUAN RISIKO</h3>
+                                        <p class="text-slate-400 font-bold text-[10px] uppercase tracking-widest">Laporan Evaluasi dan Monitoring Mitigasi RTP</p>
+                                    </div>
+                                </div>
+                                <div class="w-full lg:w-auto">
+                                    <div class="bg-slate-900 text-white px-8 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-3 group-hover:bg-emerald-600 transition-colors">
+                                        BUKA PEMANTAUAN <i data-lucide="chevron-right" class="w-4 h-4"></i>
                                     </div>
                                 </div>
                             </div>
                         </a>
                     </div>
+                    
+                    <!-- Stats Section -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-7xl mx-auto mb-10">
+                        <div class="bg-white rounded-[2.5rem] p-8 shadow-xl border border-slate-100 stat-card-glow h-full flex items-center gap-8">
+                            <div class="p-6 bg-blue-50 rounded-[2rem]"><i data-lucide="alert-circle" class="w-10 h-10 text-blue-600"></i></div>
+                            <div>
+                                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-2">Total Identifikasi Risiko</span>
+                                <span class="text-5xl font-black text-blue-600 italic leading-none">${state.isLoading ? "..." : totalRisks}</span>
+                                <span class="text-[10px] font-bold text-slate-400 block mt-3 uppercase italic tracking-wider">Tahun Pelaporan ${state.selectedYear || 'All'}</span>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-[2.5rem] p-8 shadow-xl border border-slate-100 stat-card-glow h-full flex items-center gap-8">
+                            <div class="p-6 bg-emerald-50 rounded-[2rem]"><i data-lucide="check-square" class="w-10 h-10 text-emerald-600"></i></div>
+                            <div>
+                                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest block mb-2">Tim Kerja Tuntas (100%)</span>
+                                <div class="flex items-baseline gap-2">
+                                    <span class="text-5xl font-black text-emerald-600 italic leading-none">${state.isLoading ? "..." : completedTeams}</span>
+                                    <span class="text-2xl font-bold text-slate-300 italic">/ ${filteredData.length} Tim</span>
+                                </div>
+                                <span class="text-[10px] font-bold text-emerald-500 block mt-3 uppercase tracking-widest italic">Penyusunan Matriks Risiko</span>
+                            </div>
+                        </div>
+                    </div>
 
+                    <!-- Table Section -->
                     <div class="max-w-7xl mx-auto bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden">
                         <div class="px-10 py-8 bg-slate-50/50 flex flex-col lg:flex-row items-center justify-between gap-6 border-b border-slate-100">
-                            <div class="flex items-center gap-3">
-                                <i data-lucide="table" class="w-5 h-5 text-slate-400"></i>
-                                <h4 class="text-slate-900 font-black italic uppercase tracking-tight">Rincian Progres Per Tim Kerja</h4>
+                            <div class="flex items-center gap-4">
+                                <div class="p-3 bg-white rounded-2xl shadow-sm border border-slate-100"><i data-lucide="table" class="w-6 h-6 text-slate-400"></i></div>
+                                <div>
+                                    <h4 class="text-slate-900 font-black italic uppercase tracking-tight text-lg">Rincian Progres Tim Kerja</h4>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic mt-0.5">Klik Nama Tim Untuk Akses Folder Drive</p>
+                                </div>
                             </div>
-                            <div class="flex items-center gap-4 bg-white p-2 rounded-2xl border border-slate-200 shadow-sm">
-                                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest px-2">Filter Tahun:</span>
-                                <select onchange="setState({selectedYear: this.value})" class="bg-slate-50 rounded-xl px-4 py-2 font-bold text-[10px] uppercase outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer">
+                            <div class="flex items-center gap-4 bg-white p-2.5 rounded-2xl border border-slate-200 shadow-sm">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2">Pilih Tahun:</span>
+                                <select onchange="setState({selectedYear: this.value})" class="bg-slate-50 rounded-xl px-5 py-2.5 font-black text-[11px] uppercase outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer appearance-none border border-slate-100">
                                     ${state.availableYears.map(y => `<option value="${y}" ${state.selectedYear === y ? 'selected' : ''}>${y}</option>`).join('')}
                                 </select>
                             </div>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="w-full text-left table-auto min-w-[800px]">
+                            <table class="w-full text-left table-auto min-w-[900px]">
                                 <thead>
                                     <tr class="bg-slate-50 text-[10px] font-bold text-slate-500 uppercase tracking-widest border-b">
-                                        <th class="px-8 py-6">Tim Kerja (Klik Nama untuk Drive)</th>
+                                        <th class="px-8 py-6">Tim Kerja (Link Drive)</th>
                                         <th class="px-4 py-6 text-center">Identifikasi</th>
                                         <th class="px-4 py-6 text-center">Analisis</th>
                                         <th class="px-4 py-6 text-center">RTP</th>
