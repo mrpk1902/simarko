@@ -61,6 +61,7 @@
             // Link Kertas Kerja yang sudah diperbarui
             kertasKerjaMrUrl: "https://docs.google.com/spreadsheets/d/130t925qSK9NYAusdKqxxZDoIEgoNmNejEllUip9Nj5o/edit?gid=666067745#gid=666067745", 
             pemantauanRisikoUrl: "https://docs.google.com/spreadsheets/d/1eP49Ho26uXyspYFChscbqthKWxNuD0Bd/edit?usp=drive_link&ouid=115730438453768465879&rtpof=true&sd=true",
+            formProgressUrl: "#", // SILAKAN GANTI "#" DENGAN LINK FORMULIR/SPREADSHEET PROGRES TIM KERJA
             
             mariTemanUrl: "https://risiko.web.bps.go.id/app/",
             mrpkBabelUrl: "https://babel.web.bps.go.id/mrpk/index.php",
@@ -485,6 +486,26 @@
                                 <div class="w-full lg:w-auto">
                                     <div class="bg-slate-900 text-white px-8 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-3 group-hover:bg-emerald-600 transition-colors">
                                         BUKA PEMANTAUAN <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+
+                        <!-- 3. Tombol Update Progres Tim Kerja (BARU) -->
+                        <a href="${CONFIG.formProgressUrl}" target="_blank" class="group relative block w-full bg-slate-100 rounded-[2.5rem] p-6 md:p-10 overflow-hidden shadow-sm border border-slate-200 hover:shadow-xl hover:bg-white hover:-translate-y-1 transition-all duration-300">
+                             <div class="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6">
+                                <div class="flex flex-col lg:flex-row items-center gap-6 text-center lg:text-left">
+                                    <div class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg">
+                                        <i data-lucide="edit-3" class="w-8 h-8 text-white"></i>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <h3 class="text-xl md:text-2xl font-black text-slate-800 italic uppercase tracking-tight">UPDATE PROGRES TIM KERJA</h3>
+                                        <p class="text-slate-400 font-bold text-[10px] uppercase tracking-widest">Formulir Laporan Progres Pengisian Matriks Risiko</p>
+                                    </div>
+                                </div>
+                                <div class="w-full lg:w-auto">
+                                    <div class="bg-slate-900 text-white px-8 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-3 group-hover:bg-indigo-600 transition-colors">
+                                        ISI PROGRES <i data-lucide="chevron-right" class="w-4 h-4"></i>
                                     </div>
                                 </div>
                             </div>
